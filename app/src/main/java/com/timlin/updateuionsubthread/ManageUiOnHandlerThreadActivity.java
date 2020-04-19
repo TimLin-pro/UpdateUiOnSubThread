@@ -34,6 +34,7 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
     private WindowManager mWindowManager;
     //使用 viewbinding
     private ActivityManageUiOnHandlerThreadBinding mBinding;
+    private HandlerThread mHandlerThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +44,17 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
         initClickListener();
         initTextView();
         mWindowManager = getWindowManager();
-        HandlerThread handlerThread = new HandlerThread("my handler thread");
-        handlerThread.start();
+        mHandlerThread = new HandlerThread("my handler thread");
+        mHandlerThread.start();
 
-        initHandler(handlerThread);
+        initHandler(mHandlerThread);
         printLooperLog();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHandlerThread.quitSafely();
     }
 
     private void initClickListener() {
@@ -114,7 +121,7 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
 
     /**
      * 打印指定 Looper 中 MessageQueue 中的 Message 信息
-     * */
+     */
     private void printLooperLog() {
         mHandler.getLooper().setMessageLogging(new Printer() {
             @Override
