@@ -10,6 +10,7 @@
     <Button
         android:id="@+id/btn_create_view"
         android:layout_width="match_parent"
+        android:textAllCaps="false"
         android:layout_height="wrap_content"
         android:text="create TextView in handler Thread" />
 
@@ -17,6 +18,14 @@
         android:id="@+id/btn_subthread_update_ui"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAllCaps="false"
         android:text="update View in subThread" />
+
+    <Button
+        android:id="@+id/btn_create_view_in_non_looper_thread"
+        android:textAllCaps="false"
+        android:text="create view in non looper thread"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

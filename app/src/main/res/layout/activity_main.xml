@@ -13,4 +13,13 @@
         android:layout_height="wrap_content"
         android:text="Handler Thread 更新 UI demo" />
 
+    <ImageView
+        android:id="@+id/iv"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_wechat" />
+
 </LinearLayout>

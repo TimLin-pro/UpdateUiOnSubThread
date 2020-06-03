@@ -61,6 +61,7 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
         mBinding.btnCreateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick: create view");
                 mHandler.sendEmptyMessage(CREATE_VIEW);
             }
         });
@@ -68,7 +69,29 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
         mBinding.btnSubthreadUpdateUi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick: update view");
                 mHandler.sendEmptyMessage(UPDATE_VIEW);
+            }
+        });
+        mBinding.btnCreateViewInNonLooperThread.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "run: create View in thread");
+                        final TextView textView = new TextView(ManageUiOnHandlerThreadActivity.this);
+                        textView.setText("view created in sub thread");
+
+                        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                        layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL;
+                        layoutParams.format = PixelFormat.TRANSPARENT;//设置为 透明，默认效果是 黑色的
+                        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;//设置window透传，也就是当前view所在的window不阻碍底层的window获得触摸事件。
+
+                        mWindowManager.addView(textView, layoutParams);
+                    }
+                }).start();
             }
         });
     }
@@ -111,7 +134,7 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
                         mTextView.setText("updated at non-ui-thread");
                         layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
                         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                        layoutParams.gravity = Gravity.START;
+                        layoutParams.gravity = Gravity.END;
                         mWindowManager.updateViewLayout(mTextView, layoutParams);
                         break;
                 }

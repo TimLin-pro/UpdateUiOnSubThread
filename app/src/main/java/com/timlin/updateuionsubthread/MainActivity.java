@@ -16,7 +16,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
-
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mBinding.iv.setImageResource(R.drawable.ic_qq);//更新 ui
+            }
+        }).start();
         initListener();
     }
 
