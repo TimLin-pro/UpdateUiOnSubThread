@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+        //ViewRootImpl 还没创建出来的时候，在子线程更新 ImageView，将 xml 中指定的微信图标修改为 QQ
         new Thread(new Runnable() {
             @Override
             public void run() {

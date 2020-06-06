@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.util.Printer;
@@ -35,6 +36,7 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
     //使用 viewbinding
     private ActivityManageUiOnHandlerThreadBinding mBinding;
     private HandlerThread mHandlerThread;
+    private boolean mHasClickCreateViewBtn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
         mBinding = ActivityManageUiOnHandlerThreadBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
         initClickListener();
-        initTextView();
+//        initTextView();
         mWindowManager = getWindowManager();
         mHandlerThread = new HandlerThread("my handler thread");
         mHandlerThread.start();
@@ -61,6 +63,7 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
         mBinding.btnCreateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mHasClickCreateViewBtn = true;
                 Log.d(TAG, "onClick: create view");
                 mHandler.sendEmptyMessage(CREATE_VIEW);
             }
@@ -69,16 +72,31 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
         mBinding.btnSubthreadUpdateUi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!mHasClickCreateViewBtn){
+                    Toast.makeText(ManageUiOnHandlerThreadActivity.this, "需要先 add View 然后再 update", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Log.d(TAG, "onClick: update view");
                 mHandler.sendEmptyMessage(UPDATE_VIEW);
             }
         });
         mBinding.btnCreateViewInNonLooperThread.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        // 如果没有调用 Looper#prepare，会导致 创建 ViewRootImpl 过程中实例化 ViewRootHandler 的步骤 crash
+                        // （因为不能在没有 Looper 的线程通过无参的构造函数去创建一个 Handler）
+                        Looper.prepare();
+
+                        v.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(ManageUiOnHandlerThreadActivity.this, "没有开启消息循环，队列中监听垂直同步信号的消息无法被执行，也就无法更新 UI", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
                         Log.d(TAG, "run: create View in thread");
                         final TextView textView = new TextView(ManageUiOnHandlerThreadActivity.this);
                         textView.setText("view created in sub thread");
@@ -122,6 +140,7 @@ public class ManageUiOnHandlerThreadActivity extends AppCompatActivity {
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;//设置window透传，也就是当前view所在的window不阻碍底层的window获得触摸事件。
                 switch (msg.what) {
                     case CREATE_VIEW:
+                        initTextView();
                         Log.d(TAG, "handleMessage: CREATE_VIEW");
                         mTextView.setText("created at non-ui-thread");
                         layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;

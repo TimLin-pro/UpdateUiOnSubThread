@@ -15,11 +15,15 @@
 
     <ImageView
         android:id="@+id/iv"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:scaleType="center"
         android:src="@drawable/ic_wechat" />
 
+    <TextView
+        android:id="@+id/mTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>
