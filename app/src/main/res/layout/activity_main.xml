@@ -13,6 +13,12 @@
         android:layout_height="wrap_content"
         android:text="Handler Thread 更新 UI demo" />
 
+    <Button
+        android:id="@+id/btn_entrance_update_popup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Handler Thread 更新 PopupWindow demo" />
+
     <ImageView
         android:id="@+id/iv"
         android:layout_width="wrap_content"
